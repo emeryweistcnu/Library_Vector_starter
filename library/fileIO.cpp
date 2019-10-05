@@ -1,3 +1,4 @@
+#include <fstream>
 #include "../includes_usr/fileIO.h"
 using namespace std;
 /* clears, then loads books from the file filename
@@ -7,6 +8,15 @@ using namespace std;
  * */
 int loadBooks(std::vector<book> &books, const char* filename)
 {
+	ofstream fs(filename);
+
+	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
+
+	//TODO Load books from file here
+
+	if(books.size() < 1) return NO_BOOKS_IN_LIBRARY;
+
+	fs.close();
 	return SUCCESS;
 }
 
@@ -17,6 +27,15 @@ int loadBooks(std::vector<book> &books, const char* filename)
  * */
 int saveBooks(std::vector<book> &books, const char* filename)
 {
+	if(books.size() < 1) return NO_BOOKS_IN_LIBRARY;
+
+	ofstream fs(filename);
+
+	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
+
+	//TODO Write to file here
+
+	fs.close();
 	return SUCCESS;
 }
 
@@ -27,6 +46,13 @@ int saveBooks(std::vector<book> &books, const char* filename)
  * */
 int loadPatrons(std::vector<patron> &patrons, const char* filename)
 {
+	ofstream fs(filename);
+
+	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
+
+	//TODO Load patrons here
+
+	fs.close();
 	return SUCCESS;
 }
 
@@ -37,5 +63,14 @@ int loadPatrons(std::vector<patron> &patrons, const char* filename)
  * */
 int savePatrons(std::vector<patron> &patrons, const char* filename)
 {
+	if(patrons.size() < 1) return NO_PATRONS_IN_LIBRARY;
+
+	ofstream fs(filename);
+
+	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
+
+	//TODO Save patrons to file here
+
+	fs.close();
 	return SUCCESS;
 }
