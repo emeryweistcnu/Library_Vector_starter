@@ -10,26 +10,30 @@ using namespace std;
  * */
 int loadBooks(std::vector<book> &books, const char* filename)
 {
-	fstream fs(filename);
+	ifstream fs;
+	fs.open(filename, ios_base::in);
 
 	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
 
 	std::string line;
-	std::vector<book>::iterator it = books.begin();
 
 	while (std::getline(fs, line))
 	{
 		stringstream ss(line);
 		book b;
-		std::string id;
-		std:: string title;
-		std:: string author;
+		std::string id, title, author, state, patronid;
+
 		std::getline(ss, id, ',');
 		std::getline(ss, title, ',');
 		std::getline(ss, author, ',');
+		std::getline(ss, state, ',');
+		std::getline(ss, patronid, ',');
+
 		b.book_id = std::stoi(id, nullptr, 10);
+		b.title = title;
 		b.author = author;
-		cout << line << endl;
+		b.state = static_cast<book_checkout_state>(std::stoi(state, nullptr, 10));
+		b.loaned_to_patron_id = std::stoi(patronid, nullptr, 10);
 
 		books.push_back(b);
 	}
@@ -52,8 +56,13 @@ int saveBooks(std::vector<book> &books, const char* filename)
 	fstream fs(filename);
 
 	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
+	while(books.size() > 0)
+	{
+		book b = books.back();
+		books.pop_back();
 
-	//TODO Write to file here
+		fs << std::to_string(b.book_id) << ",\"" << b.title << "\"," << endl;
+	}
 
 	fs.close();
 	return SUCCESS;
