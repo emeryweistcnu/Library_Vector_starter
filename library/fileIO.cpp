@@ -10,12 +10,13 @@ using namespace std;
  * */
 int loadBooks(std::vector<book> &books, const char* filename)
 {
-	ifstream fs;
-	fs.open(filename, ios_base::in);
+	ifstream fs(filename);
 
 	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
 
 	std::string line;
+
+	books.clear();
 
 	while (std::getline(fs, line))
 	{
@@ -38,9 +39,10 @@ int loadBooks(std::vector<book> &books, const char* filename)
 		books.push_back(b);
 	}
 
+	fs.close();
+
 	if(books.size() < 1) return NO_BOOKS_IN_LIBRARY;
 
-	fs.close();
 	return SUCCESS;
 }
 
@@ -53,16 +55,16 @@ int saveBooks(std::vector<book> &books, const char* filename)
 {
 	if(books.size() < 1) return NO_BOOKS_IN_LIBRARY;
 
-	fstream fs(filename);
+	ofstream fs(filename);
 
 	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
-	while(books.size() > 0)
+
+	for(int i = 0; i < books.size(); i++)
 	{
-		book b = books.back();
-		books.pop_back();
+		book b = books[i];
 
 		fs << std::to_string(b.book_id) << "," << b.title << "," << b.author
-				<< "," << b.state << "," << b.loaned_to_patron_id << endl;
+						<< "," << b.state << "," << b.loaned_to_patron_id << endl;
 	}
 
 	fs.close();
@@ -76,11 +78,13 @@ int saveBooks(std::vector<book> &books, const char* filename)
  * */
 int loadPatrons(std::vector<patron> &patrons, const char* filename)
 {
-	fstream fs(filename);
+	ifstream fs(filename);
 
 	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
 
 	std::string line;
+
+	patrons.clear();
 
 	while (std::getline(fs, line))
 	{
@@ -99,6 +103,8 @@ int loadPatrons(std::vector<patron> &patrons, const char* filename)
 		patrons.push_back(p);
 	}
 
+	if(patrons.size() < 1) return NO_PATRONS_IN_LIBRARY;
+
 	fs.close();
 	return SUCCESS;
 }
@@ -112,14 +118,13 @@ int savePatrons(std::vector<patron> &patrons, const char* filename)
 {
 	if(patrons.size() < 1) return NO_PATRONS_IN_LIBRARY;
 
-	fstream fs(filename);
+	ofstream fs(filename);
 
 	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
 
-	while(patrons.size() > 0)
+	for(int i = 0; i < patrons.size(); i++)
 	{
-		patron p = patrons.back();
-		patrons.pop_back();
+		patron p = patrons[i];
 
 		fs << std::to_string(p.patron_id) << "," << p.name << "," << p.number_books_checked_out << endl;
 	}

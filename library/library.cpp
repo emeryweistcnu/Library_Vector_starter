@@ -23,12 +23,10 @@ int nextPatronID = 0;
  */
 void reloadAllData()
 {
-	books.clear();
-	patrons.clear();
-	nextPatronID = 0;
-
 	loadBooks(books, BOOKFILE.c_str());
 	loadPatrons(patrons, PATRONFILE.c_str());
+
+	nextPatronID = patrons.size() - 1;
 }
 
 /* checkout a book to a patron
@@ -53,6 +51,8 @@ void reloadAllData()
  */
 int checkout(int bookid, int patronid)
 {
+	reloadAllData();
+
 	for (int i = 0; i < books.size(); i++)
 	{
 		if(books[i].book_id == bookid)
@@ -66,6 +66,8 @@ int checkout(int bookid, int patronid)
 					books[i].loaned_to_patron_id = patronid;
 					books[i].state = book_checkout_state::OUT;
 
+					saveBooks(books, BOOKFILE_EMPTY.c_str());
+					savePatrons(patrons, PATRONFILE_EMPTY.c_str());
 					return SUCCESS;
 				}
 			}
@@ -89,6 +91,8 @@ int checkout(int bookid, int patronid)
  */
 int checkin(int bookid)
 {
+	reloadAllData();
+
 	for (int i = 0; i < books.size(); i++)
 	{
 		if (books[i].book_id == bookid)
@@ -105,6 +109,8 @@ int checkin(int bookid)
 					books[i].state = book_checkout_state::IN;
 					books[i].loaned_to_patron_id = NO_ONE;
 
+					saveBooks(books, BOOKFILE_EMPTY.c_str());
+					savePatrons(patrons, PATRONFILE_EMPTY.c_str());
 					return SUCCESS;
 				}
 			}
@@ -125,6 +131,8 @@ int checkin(int bookid)
  */
 int enroll(std::string &name)
 {
+	reloadAllData();
+
 	patron p;
 
 	p.name = name;
@@ -134,6 +142,8 @@ int enroll(std::string &name)
 
 	patrons.push_back(p);
 
+	saveBooks(books, BOOKFILE_EMPTY.c_str());
+	savePatrons(patrons, PATRONFILE_EMPTY.c_str());
 	return p.patron_id;
 }
 
