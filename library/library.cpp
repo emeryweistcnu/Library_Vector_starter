@@ -26,6 +26,9 @@ void reloadAllData()
 	books.clear();
 	patrons.clear();
 	nextPatronID = 0;
+
+	loadBooks(books, BOOKFILE.c_str());
+	loadPatrons(patrons, PATRONFILE.c_str());
 }
 
 /* checkout a book to a patron
@@ -58,7 +61,7 @@ int checkout(int bookid, int patronid)
 			{
 				if (patrons[j].patron_id == patronid)
 				{
-					if (patrons[j].number_books_checked_out >= MAX_BOOKS_ALLOWED_OUT) return TOO_MANY_OUT;
+					if (patrons[j].number_books_checked_out > MAX_BOOKS_ALLOWED_OUT - 1) return TOO_MANY_OUT;
 
 					books[i].loaned_to_patron_id = patronid;
 					books[i].state = book_checkout_state::OUT;
@@ -68,6 +71,7 @@ int checkout(int bookid, int patronid)
 			}
 		}
 	}
+
 	return BOOK_NOT_IN_COLLECTION;
 }
 

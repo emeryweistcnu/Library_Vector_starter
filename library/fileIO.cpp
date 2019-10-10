@@ -61,7 +61,8 @@ int saveBooks(std::vector<book> &books, const char* filename)
 		book b = books.back();
 		books.pop_back();
 
-		fs << std::to_string(b.book_id) << ",\"" << b.title << "\"," << endl;
+		fs << std::to_string(b.book_id) << "," << b.title << "," << b.author
+				<< "," << b.state << "," << b.loaned_to_patron_id << endl;
 	}
 
 	fs.close();
@@ -79,7 +80,24 @@ int loadPatrons(std::vector<patron> &patrons, const char* filename)
 
 	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
 
-	//TODO Load patrons here
+	std::string line;
+
+	while (std::getline(fs, line))
+	{
+		stringstream ss(line);
+		patron p;
+		string id, name, books;
+
+		std::getline(ss, id, ',');
+		std::getline(ss, name, ',');
+		std::getline(ss, books, ',');
+
+		p.patron_id = std::stoi(id, nullptr, 10);
+		p.name = name;
+		p.number_books_checked_out = std::stoi(books, nullptr, 10);
+
+		patrons.push_back(p);
+	}
 
 	fs.close();
 	return SUCCESS;
@@ -98,7 +116,13 @@ int savePatrons(std::vector<patron> &patrons, const char* filename)
 
 	if(!fs.is_open()) return COULD_NOT_OPEN_FILE;
 
-	//TODO Save patrons to file here
+	while(patrons.size() > 0)
+	{
+		patron p = patrons.back();
+		patrons.pop_back();
+
+		fs << std::to_string(p.patron_id) << "," << p.name << "," << p.number_books_checked_out << endl;
+	}
 
 	fs.close();
 	return SUCCESS;
