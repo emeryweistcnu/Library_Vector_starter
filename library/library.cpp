@@ -15,7 +15,6 @@ using namespace std;
 
 vector<book> books;
 vector<patron> patrons;
-int nextPatronID = 0;
 
 /*
  * clear books and patrons containers
@@ -23,10 +22,11 @@ int nextPatronID = 0;
  */
 void reloadAllData()
 {
+	books.clear();
+	patrons.clear();
+
 	loadBooks(books, BOOKFILE.c_str());
 	loadPatrons(patrons, PATRONFILE.c_str());
-
-	nextPatronID = patrons.size() - 1;
 }
 
 /* checkout a book to a patron
@@ -65,12 +65,15 @@ int checkout(int bookid, int patronid)
 
 					books[i].loaned_to_patron_id = patronid;
 					books[i].state = book_checkout_state::OUT;
+					patrons[j].number_books_checked_out++;
 
-					saveBooks(books, BOOKFILE_EMPTY.c_str());
-					savePatrons(patrons, PATRONFILE_EMPTY.c_str());
+					saveBooks(books, BOOKFILE.c_str());
+					savePatrons(patrons, PATRONFILE.c_str());
 					return SUCCESS;
 				}
 			}
+
+			return PATRON_NOT_ENROLLED;
 		}
 	}
 
@@ -99,18 +102,20 @@ int checkin(int bookid)
 		{
 			if (books[i].state == book_checkout_state::IN
 					|| books[i].loaned_to_patron_id == NO_ONE)
+				saveBooks(books, BOOKFILE.c_str());
+				savePatrons(patrons, PATRONFILE.c_str());
 				return SUCCESS;
 
 			for (int j = 0; j < patrons.size(); j++)
 			{
 				if (books[i].loaned_to_patron_id == patrons[j].patron_id)
 				{
-					patrons[j].number_books_checked_out = 0;
+					patrons[j].number_books_checked_out--;
 					books[i].state = book_checkout_state::IN;
 					books[i].loaned_to_patron_id = NO_ONE;
 
-					saveBooks(books, BOOKFILE_EMPTY.c_str());
-					savePatrons(patrons, PATRONFILE_EMPTY.c_str());
+					saveBooks(books, BOOKFILE.c_str());
+					savePatrons(patrons, PATRONFILE.c_str());
 					return SUCCESS;
 				}
 			}
@@ -136,14 +141,12 @@ int enroll(std::string &name)
 	patron p;
 
 	p.name = name;
-	p.patron_id = nextPatronID;
-
-	nextPatronID++;
+	p.patron_id = patrons.size();
+	p.number_books_checked_out = 0;
 
 	patrons.push_back(p);
 
-	saveBooks(books, BOOKFILE_EMPTY.c_str());
-	savePatrons(patrons, PATRONFILE_EMPTY.c_str());
+	savePatrons(patrons, PATRONFILE.c_str());
 	return p.patron_id;
 }
 
@@ -154,6 +157,8 @@ int enroll(std::string &name)
  */
 int numbBooks()
 {
+	reloadAllData();
+
 	return books.size();
 }
 
@@ -163,6 +168,8 @@ int numbBooks()
  */
 int numbPatrons()
 {
+	reloadAllData();
+
 	return patrons.size();
 }
 
