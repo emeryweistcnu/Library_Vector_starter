@@ -102,9 +102,11 @@ int checkin(int bookid)
 		{
 			if (books[i].state == book_checkout_state::IN
 					|| books[i].loaned_to_patron_id == NO_ONE)
+			{
 				saveBooks(books, BOOKFILE.c_str());
 				savePatrons(patrons, PATRONFILE.c_str());
 				return SUCCESS;
+			}
 
 			for (int j = 0; j < patrons.size(); j++)
 			{
